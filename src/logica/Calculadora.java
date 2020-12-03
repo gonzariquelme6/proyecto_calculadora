@@ -20,7 +20,8 @@ public class Calculadora {
 	 * Creo una calculadora nueva
 	 */
 	public Calculadora () {
-		ruta = new File("./plugins");
+		//ruta = new File("./plugins");
+		ruta = new File("./bin/plugins");
 	}
 
 
@@ -44,18 +45,16 @@ public class Calculadora {
 			
 			//si la carpeta de plugins no estaba vaica
 			if (archivos!=null) {
-				JOptionPane.showMessageDialog(null,"Ruta:"+ruta);
 				for (int i=0;i<archivos.length;i++) {
-					
 					if (archivos[i].endsWith(".class")) {
-						//si es un archivo que termina en .class llamo a loadClass del PluginClassLoader y cargo el plugin
+						//si es un archivo que termina en .class cargo la clase
 						c = cl.loadClass(archivos[i].substring(0, archivos[i].indexOf(".")));
 						interfaces = c.getInterfaces();
 						
 						for (Class interf : interfaces) {
 							//si la clase implementa PluginFunction la agrego a la lista de plugins
 							if (interf.getName().contentEquals("logica.PluginFunction")) {
-								//ERROR EN EL CASTEO CUANDO EXPORTO EL JAR
+								//Aca me da error en el casteo cuando lo ejecuto en el jar
 								pf = (PluginFunction) c.getDeclaredConstructor().newInstance();
 								plugins.add(pf);
 								cant_plugins++;
@@ -71,13 +70,13 @@ public class Calculadora {
 				JOptionPane.showMessageDialog(null,"Error en la ruta de los plugins.");
 			}
 		}catch (Exception ex) {
-			JOptionPane.showMessageDialog(null, "Ex:"+ex.toString());
+			JOptionPane.showMessageDialog(null, "Error inesperado:"+ex.getClass().getSimpleName());
 		}
 	}
 
 	/**
-	 * Metodo que retorna el nombre de los plugins
-	 * @return arrego con los nombres de los plugins en la carpeta seteada.
+	 * Metodo que retorna los nombres de los plugins
+	 * @return arreglo con los nombres de los plugins en la carpeta seteada.
 	 */
 	public String[] getNombresPlugins() {
 		PluginFunction function;
