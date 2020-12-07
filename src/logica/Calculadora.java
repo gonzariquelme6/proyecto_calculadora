@@ -20,15 +20,15 @@ public class Calculadora {
 	 * Creo una calculadora nueva
 	 */
 	public Calculadora () {
-		//ruta = new File("./plugins");
-		ruta = new File("./bin/plugins");
+		ruta = new File("./plugins");
+		//ruta = new File("./bin/plugins");
 	}
 
 
 	/**
 	 * Metodo que carga los plugins de la ruta indicada
 	 */
-	public void getPlugins() throws NoClassDefFoundError{
+	public void getPlugins() throws Exception{
 		ClassLoader cl;
 		Class c;
 		Class [] interfaces;
@@ -37,40 +37,37 @@ public class Calculadora {
 		plugins = new ArrayList<PluginFunction>();
 		
 		
-		try {
-			//cargo los archivos de la carpeta de plugins
-			cl = new PluginClassLoader(ruta);
-			archivos = ruta.list();
-			cant_plugins=0;
-			
-			//si la carpeta de plugins no estaba vaica
-			if (archivos!=null) {
-				for (int i=0;i<archivos.length;i++) {
-					if (archivos[i].endsWith(".class")) {
-						//si es un archivo que termina en .class cargo la clase
-						c = cl.loadClass(archivos[i].substring(0, archivos[i].indexOf(".")));
-						interfaces = c.getInterfaces();
-						
-						for (Class interf : interfaces) {
-							//si la clase implementa PluginFunction la agrego a la lista de plugins
-							if (interf.getName().contentEquals("logica.PluginFunction")) {
-								//Aca me da error en el casteo cuando lo ejecuto en el jar
-								pf = (PluginFunction) c.getDeclaredConstructor().newInstance();
-								plugins.add(pf);
-								cant_plugins++;
-								break;
-							}
-						}
-
-					}
+		//cargo los archivos de la carpeta de plugins
+		cl = new PluginClassLoader(ruta);
+		archivos = ruta.list();
+		cant_plugins=0;
+		
+		//si la carpeta de plugins no estaba vaica
+		if (archivos!=null) {
+			for (int i=0;i<archivos.length;i++) {
+				if (archivos[i].endsWith(".class")) {
+					//si es un archivo que termina en .class cargo la clase
+					c = cl.loadClass("logica."+archivos[i].substring(0, archivos[i].indexOf(".")));
+					interfaces = c.getInterfaces();
 					
+					for (Class interf : interfaces) {
+						//si la clase implementa PluginFunction la agrego a la lista de plugins
+						if (interf.getName().contentEquals("logica.PluginFunction")) {
+							//JOptionPane.showMessageDialog(null, "AAAAAAAAA");
+							//Aca me da error en el casteo cuando lo ejecuto en el jar
+							pf = (PluginFunction) c.getDeclaredConstructor().newInstance();
+							plugins.add(pf);
+							cant_plugins++;
+							break;
+						}
+					}
+
 				}
+					
 			}
-			else {
-				JOptionPane.showMessageDialog(null,"Error en la ruta de los plugins.");
-			}
-		}catch (Exception ex) {
-			JOptionPane.showMessageDialog(null, "Error inesperado:"+ex.getClass().getSimpleName());
+		}
+		else {
+			JOptionPane.showMessageDialog(null,"Error en la ruta de los plugins:"+ruta);
 		}
 	}
 
